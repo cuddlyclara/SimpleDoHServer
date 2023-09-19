@@ -1,4 +1,12 @@
 #!/usr/bin/python3
+
+"""
+Name: cuddlyclara
+Website: cuddlyclara.de
+Source: https://github.com/cuddlyclara/SimpleDoHServer
+Description: Very simple DoH server based on Python 3, which passes the client IP via ECS.
+"""
+
 import base64
 import logging
 import ipaddress
