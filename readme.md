@@ -28,6 +28,13 @@ dnsserver = '10.10.10.10'
 realipheader = 'X-Forwarded-For'
 ```
 
+For reduced logging, it's advisable to set the LogLevel to something like `logging.WARNING`, for instance.
+
+```bash
+# Set the LogLevel to logging.WARNING or logging.ERROR to suppress the output of DNS requests
+logging.basicConfig(level=logging.WARNING)
+```
+
 # Execution
 
 Since all options are already set within the script, you can easily start the script from the command line:
