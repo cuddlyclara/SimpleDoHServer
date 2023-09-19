@@ -54,3 +54,7 @@ A recommended approach is to run this as a service using Systemd.
 # Troubleshooting
 
 By default, Pi-hole uses the web server Lighttpd. Up to and including version 1.4.59, the web server responded to empty HTTP headers with a response code of 400. This prevented Firefox from sending requests to the DoH server behind the Lighttpd server due to its default empty "Accept-Encoding" header in DoH requests. This issue was fixed in [this commit](https://github.com/lighttpd/lighttpd1.4/commit/262561f). Unfortunately, older Debian servers cannot update to a Lighttpd version >= 1.4.60. One possible workaround is to set the switch `network.trr.send_empty_accept-encoding_headers` to `false` under `about:config`.
+
+# Security
+
+Since this is just a simple implementation of a DoH server with minimal input validation, it's best to use this server only in its intended environment, such as within a local network.
