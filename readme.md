@@ -36,6 +36,12 @@ Since all options are already set within the script, you can easily start the sc
 ./server.py
 ```
 
+Before running the script, it may be necessary to make the script executable:
+
+```bash
+chmod +x server.py
+```
+
 A recommended approach is to run this as a service using Systemd.
 
 # Troubleshooting
