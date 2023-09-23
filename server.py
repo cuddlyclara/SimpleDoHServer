@@ -44,7 +44,7 @@ def requestDNSAnswer(query, clientip):
     response = dns.query.udp(request, dnsserver)
     return response.to_wire()
 
-def main()
+def main():
     # Create the DoH server
     with socketserver.TCPServer((host, port), DohHandler) as httpd:
         try:
