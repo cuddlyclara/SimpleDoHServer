@@ -44,6 +44,16 @@ def requestDNSAnswer(query, clientip):
     response = dns.query.udp(request, dnsserver)
     return response.to_wire()
 
+def main()
+    # Create the DoH server
+    with socketserver.TCPServer((host, port), DohHandler) as httpd:
+        try:
+            print(f'Serving DoH on {host}:{port} using DNS server {dnsserver}')
+            httpd.serve_forever()
+        except KeyboardInterrupt:
+            print('Shutting down the server...')
+            httpd.shutdown()
+
 class DohHandler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
         # Parse the dns query parameter
@@ -67,20 +77,15 @@ class DohHandler(http.server.BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(requestDNSAnswer(dns_query, self.headers[realipheader]))
 
-# Set the LogLevel to logging.WARNING or logging.ERROR to suppress the output of DNS requests
-logging.basicConfig(level=logging.INFO)
+if __name__ == '__main__':
+    # Set the LogLevel to logging.WARNING or logging.ERROR to suppress the output of DNS requests
+    logging.basicConfig(level=logging.INFO)
 
-# Set the server address, port, dnsserver and the real ip header
-host = '127.0.0.1'
-port = 8080
-dnsserver = '10.10.10.10'
-realipheader = 'X-Forwarded-For'
+    # Set the server address, port, dnsserver and the real ip header
+    host = '127.0.0.1'
+    port = 8080
+    dnsserver = '10.10.10.10'
+    realipheader = 'X-Forwarded-For'
 
-# Create the DoH server
-with socketserver.TCPServer((host, port), DohHandler) as httpd:
-    try:
-        print(f'Serving DoH on {host}:{port} using DNS server {dnsserver}')
-        httpd.serve_forever()
-    except KeyboardInterrupt:
-        print('Shutting down the server...')
-        httpd.shutdown()
+    # Call the main function
+    main()
