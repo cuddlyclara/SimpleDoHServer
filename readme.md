@@ -18,13 +18,14 @@ pip3 install dnspython
 
 # Configuration
 
-Settings are defined using variables within the script. By default, the server uses port 8080 on localhost. The DNS server used here is set as an example to the IP address 10.10.10.10 and need to be replaced with the IP address of your local DNS server. Additionally, the header containing the real client IP can be modified as needed.
+Settings are defined using variables within the script. By default, the server uses port 8080 on localhost. The DNS server used here is set as an example to the IP address 10.10.10.10 and need to be replaced with the IP address of your local DNS server. Additionally, the dns request timeout and the header containing the real client IP can be modified as needed.
 
 ```python
-# Set the server address, port, dnsserver, and the real IP header
+# Set the server address, port, dns server, dns request timeout (in seconds) and the real ip header
 host = '127.0.0.1'
 port = 8080
 dnsserver = '10.10.10.10'
+timeout = 10
 realipheader = 'X-Forwarded-For'
 ```
 
