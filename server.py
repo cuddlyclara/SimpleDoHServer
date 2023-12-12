@@ -87,7 +87,7 @@ if __name__ == '__main__':
     # Set the LogLevel to logging.WARNING or logging.ERROR to suppress the output of DNS requests
     logging.basicConfig(level=logging.INFO)
 
-    # Set the server address, port, dns server, dns request timeout and the real ip header
+    # Set the server address, port, dns server, dns request timeout (in seconds) and the real ip header
     host = '127.0.0.1'
     port = 8080
     dnsserver = '10.10.10.10'
