@@ -38,14 +38,14 @@ def requestDNSAnswer(query, clientip):
         ecs = dns.edns.ECSOption.from_text(clientip + '/32')
         request.use_edns(edns=True, options=[ecs])
     else:
-        logging.warn(f'client IP {clientip} not valid using server IP for request')
+        logging.warning(f'client IP {clientip} not valid using server IP for request')
 
     # Send the query
     response, fallback_used = dns.query.udp_with_fallback(request, dnsserver, timeout)
 
     # Log a warning if fallback to TCP was necessary
     if fallback_used:
-        logging.warn('fallback to TCP required')
+        logging.warning('fallback to TCP required')
 
     # Return the DNS response
     return response.to_wire()
