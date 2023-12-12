@@ -38,10 +38,16 @@ def requestDNSAnswer(query, clientip):
         ecs = dns.edns.ECSOption.from_text(clientip + '/32')
         request.use_edns(edns=True, options=[ecs])
     else:
-        logging.warn(f'client IP {clientip} not valid using server IP for request');
+        logging.warn(f'client IP {clientip} not valid using server IP for request')
 
-    # Send the query and return the DNS response
-    response = dns.query.udp(request, dnsserver)
+    # Send the query
+    response, fallback_used = dns.query.udp_with_fallback(request, dnsserver, timeout)
+
+    # Log a warning if fallback to TCP was necessary
+    if fallback_used:
+        logging.warn('fallback to TCP required')
+
+    # Return the DNS response
     return response.to_wire()
 
 def main():
@@ -81,10 +87,11 @@ if __name__ == '__main__':
     # Set the LogLevel to logging.WARNING or logging.ERROR to suppress the output of DNS requests
     logging.basicConfig(level=logging.INFO)
 
-    # Set the server address, port, dnsserver and the real ip header
+    # Set the server address, port, dns server, dns request timeout and the real ip header
     host = '127.0.0.1'
     port = 8080
     dnsserver = '10.10.10.10'
+    timeout = 10
     realipheader = 'X-Forwarded-For'
 
     # Call the main function
