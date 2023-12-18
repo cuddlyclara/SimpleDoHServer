@@ -7,6 +7,7 @@ Source: https://github.com/cuddlyclara/SimpleDoHServer
 Description: Very simple DoH server based on Python 3, which passes the client IP via ECS.
 """
 
+import json
 import base64
 import logging
 import ipaddress
@@ -61,27 +62,62 @@ def main():
             httpd.shutdown()
 
 class DohHandler(http.server.BaseHTTPRequestHandler):
-    def do_GET(self):
-        # Parse the dns query parameter
-        query = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
-        dns_query = query.get('dns', [b''])[0]
+    def sendErrorResponse(self, code, e):
+        error_data = {
+            'error_code': code,
+            'error_type': type(e).__name__,
+            'error_message': str(e)
+        }
+        self.send_response(code)
+        self.send_header('Content-Type', 'application/json')
+        self.end_headers()
+        self.wfile.write(json.dumps({'error': error_data}).encode('utf-8'))
 
-        # Respond with DoH response
+    def sendDoHResponse(self, dns_answer):
         self.send_response(200)
         self.send_header('Content-Type', 'application/dns-message')
         self.end_headers()
-        self.wfile.write(requestDNSAnswer(base64.b64decode(dns_query), self.headers[realipheader]))
+        self.wfile.write(dns_answer)
+
+    def do_GET(self):
+        try:
+            # Parse the dns query parameter
+            query = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            dns_query = base64.b64decode(query['dns'][0])
+        except Exception as e:
+            # Provides a 'Bad Request' response in case of a parsing error
+            self.sendErrorResponse(400, e)
+            raise
+
+        try:
+            dns_answer = requestDNSAnswer(dns_query, self.headers[realipheader])
+        except Exception as e:
+            # Provides a 'Internal Server Error' response in case of a DNS resolution error
+            self.sendErrorResponse(500, e)
+            raise
+
+        # Respond with DoH response
+        self.sendDoHResponse(dns_answer)
 
     def do_POST(self):
-        # Parse input stream
-        content_length = int(self.headers['Content-Length'])
-        dns_query = self.rfile.read(content_length)
+        try:
+            # Parse the input stream
+            content_length = int(self.headers['Content-Length'])
+            dns_query = self.rfile.read(content_length)
+        except Exception as e:
+            # Provides a 'Bad Request' response in case of a parsing error
+            self.sendErrorResponse(400, e)
+            raise
+
+        try:
+            dns_answer = requestDNSAnswer(dns_query, self.headers[realipheader])
+        except Exception as e:
+            # Provides a 'Internal Server Error' response in case of a DNS resolution error
+            self.sendErrorResponse(500, e)
+            raise
 
         # Respond with DoH response
-        self.send_response(200)
-        self.send_header('Content-Type', 'application/dns-message')
-        self.end_headers()
-        self.wfile.write(requestDNSAnswer(dns_query, self.headers[realipheader]))
+        self.sendDoHResponse(dns_answer)
 
 if __name__ == '__main__':
     # Set the LogLevel to logging.WARNING or logging.ERROR to suppress the output of DNS requests
