@@ -52,6 +52,9 @@ def requestDNSAnswer(query, clientip):
     return response.to_wire()
 
 def main():
+    # Enable address reuse to prevent 'Address already in use' error
+    socketserver.TCPServer.allow_reuse_address = True
+
     # Create the DoH server
     with socketserver.TCPServer((host, port), DohHandler) as httpd:
         try:
